@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <!-- macOS Space Black Anodized Squircle Housing -->
+    <linearGradient id="rc-housing" x1="10" y1="4" x2="54" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#36363D"/>
+      <stop offset="50%" stop-color="#1E1E22"/>
+      <stop offset="100%" stop-color="#131317"/>
+    </linearGradient>
+    <!-- Specular Top Bevel Rim (crisp silhouette on both dark & light bars) -->
+    <linearGradient id="rc-rim" x1="32" y1="2" x2="32" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.44"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.16"/>
+    </linearGradient>
+    <!-- Machined Silver-Titanium Left Plane -->
+    <linearGradient id="rc-left" x1="17" y1="16" x2="25" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#C7C7CC"/>
+    </linearGradient>
+    <!-- Platinum M-Slice Bowl -->
+    <linearGradient id="rc-bowl" x1="27" y1="16" x2="46" y2="35" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F5F5F7"/>
+      <stop offset="100%" stop-color="#AEAEB2"/>
+    </linearGradient>
+    <!-- Anodized Cupertino Blue Kinetic Leg -->
+    <linearGradient id="rc-leg" x1="30" y1="35" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#40A9FF"/>
+      <stop offset="100%" stop-color="#0071E3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Continuous macOS Squircle Base -->
+  <path d="M 32 2 C 52.8 2 62 11.2 62 32 C 62 52.8 52.8 62 32 62 C 11.2 62 2 52.8 2 32 C 2 11.2 11.2 2 32 2 Z" fill="url(#rc-housing)"/>
+  <path d="M 32 2.75 C 52.3 2.75 61.25 11.7 61.25 32 C 61.25 52.3 52.3 61.25 32 61.25 C 11.7 61.25 2.75 52.3 2.75 32 C 2.75 11.7 11.7 2.75 32 2.75 Z" stroke="url(#rc-rim)" stroke-width="1.5"/>
+
+  <!-- Slice 1: Left Block Monolith Pillar -->
+  <path d="M 18 17.5 C 18 16.67 18.67 16 19.5 16 H 24.5 V 48 H 19.5 C 18.67 48 18 47.33 18 46.5 Z" fill="url(#rc-left)"/>
+
+  <!-- Slice 2: Middle Free M-Slice Curved Upper Arc (separated by crisp 2.5px channel) -->
+  <path d="M 27.5 16 H 36.8 C 43.0 16 46.8 19.4 46.8 25.0 C 46.8 30.6 43.0 34.0 36.8 34.0 H 27.5 V 28.4 H 36.0 C 39.2 28.4 40.9 27.1 40.9 25.0 C 40.9 22.9 39.2 21.6 36.0 21.6 H 27.5 Z" fill="url(#rc-bowl)"/>
+
+  <!-- Slice 3: Right Kinetic Diagonal Leg (Roux forward momentum) -->
+  <path d="M 29.5 36.8 H 37.8 L 47.4 46.7 C 48.0 47.3 47.55 48 46.7 48 H 39.4 L 29.5 36.8 Z" fill="url(#rc-leg)"/>
+</svg>

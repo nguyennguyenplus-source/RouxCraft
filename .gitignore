@@ -1,0 +1,11 @@
+# Tooling and local scratch files
+.agents/
+.impeccable/
+scratch/
+
+# OS and runtime artifacts
+.DS_Store
+Thumbs.db
+*.log
+__pycache__/
+*.pyc

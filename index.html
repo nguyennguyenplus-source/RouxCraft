@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RouxCraft | Roux Method Workbench & 3D Studio</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function(){var t=localStorage.getItem('rouxcraft_theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}})();
+    </script>
+    <link rel="stylesheet" href="css/style.css?v=20261118-apple6">
+    <!-- Offline vendor libraries -->
+    <script src="vendor/lucide.min.js"></script>
+    <script src="vendor/html2canvas.min.js"></script>
+    <script src="vendor/jspdf.umd.min.js"></script>
+    <script src="vendor/cube.js"></script>
+    <script src="vendor/solve.js"></script>
+</head>
+<body>
+
+    <!-- macOS Frosted Translucent Navigation Bar -->
+    <header class="app-header">
+        <div class="header-container">
+            <a href="#top" class="brand-section" onclick="event.preventDefault(); window.scrollTo({top:0,behavior:'smooth'});" aria-label="RouxCraft">
+                <img src="assets/logo.svg" alt="RouxCraft Logo" class="brand-emblem" width="32" height="32">
+                <span class="brand-wordmark">RouxCraft</span>
+            </a>
+
+            <!-- Authentic Apple Segmented Control -->
+            <nav class="header-tabs" role="tablist" aria-label="Không gian làm việc">
+                <button type="button" class="tab-btn active" data-view="sheet" role="tab" aria-selected="true">
+                    <i data-lucide="layout-grid" style="width: 14px; height: 14px;"></i>
+                    <span>Tờ Hướng Dẫn</span>
+                </button>
+                <button type="button" class="tab-btn" data-view="studio" role="tab" aria-selected="false">
+                    <i data-lucide="box" style="width: 14px; height: 14px;"></i>
+                    <span>Xưởng Vẽ 3D</span>
+                </button>
+                <button type="button" class="tab-btn" data-view="timer" role="tab" aria-selected="false">
+                    <i data-lucide="timer" style="width: 14px; height: 14px;"></i>
+                    <span>Bấm Giờ</span>
+                </button>
+            </nav>
+
+            <!-- Streamlined macOS Toolbar Actions -->
+            <div class="header-actions">
+                <button type="button" class="action-btn" id="btn-roux-guide" title="Cẩm nang hướng dẫn phương pháp Roux">
+                    <i data-lucide="book-open" style="width: 15px; height: 15px;"></i>
+                    <span>Cẩm Nang</span>
+                </button>
+
+                <button type="button" class="action-btn btn-icon-only" id="btn-theme-toggle" title="Chuyển chế độ Sáng / Tối (Apple Light / Pro Dark)" aria-label="Đổi giao diện Sáng / Tối">
+                    <i data-lucide="sun" id="theme-toggle-icon" style="width: 16px; height: 16px;"></i>
+                </button>
+
+                <div class="header-menu-wrap">
+                    <button type="button" class="action-btn btn-icon-only" id="btn-tools-menu" title="Xuất dữ liệu, âm thanh & sao lưu" aria-haspopup="true" aria-expanded="false">
+                        <i data-lucide="ellipsis" style="width: 16px; height: 16px;"></i>
+                    </button>
+                    <div class="mac-popover-menu" id="header-tools-popover" role="menu">
+                        <button type="button" class="popover-item" id="btn-export-pdf" role="menuitem">
+                            <i data-lucide="printer" style="width: 15px; height: 15px;"></i>
+                            <span>Xuất PDF (In A4)</span>
+                        </button>
+                        <button type="button" class="popover-item" id="btn-export-poster" role="menuitem">
+                            <i data-lucide="image" style="width: 15px; height: 15px;"></i>
+                            <span>Xuất Ảnh Poster PNG</span>
+                        </button>
+                        <div class="popover-sep"></div>
+                        <button type="button" class="popover-item" id="btn-sound-toggle" role="menuitem">
+                            <i data-lucide="volume-2" style="width: 15px; height: 15px;"></i>
+                            <span>Âm thanh xoay Rubik</span>
+                        </button>
+                        <div class="popover-sep"></div>
+                        <button type="button" class="popover-item" id="btn-backup-json" role="menuitem">
+                            <i data-lucide="hard-drive-download" style="width: 15px; height: 15px;"></i>
+                            <span>Sao lưu JSON</span>
+                        </button>
+                        <label class="popover-item" role="menuitem" style="cursor: pointer;">
+                            <i data-lucide="hard-drive-upload" style="width: 15px; height: 15px;"></i>
+                            <span>Phục hồi từ JSON</span>
+                            <input type="file" id="input-restore-json" accept=".json" style="display: none;">
+                        </label>
+                        <div class="popover-sep"></div>
+                        <button type="button" class="popover-item" id="btn-auth-toggle" role="menuitem">
+                            <i data-lucide="lock" id="auth-popover-icon" style="width: 15px; height: 15px;"></i>
+                            <span id="auth-popover-text">Đăng nhập Admin</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" class="action-btn btn-primary" id="btn-new-case" title="Tự vẽ thêm trường hợp mới">
+                    <i data-lucide="plus" style="width: 15px; height: 15px;"></i>
+                    <span>Thêm Case</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="app-container">
+
+        <!-- ===================================================================
+             VIEW 1: CHEAT SHEET (TỜ HƯỚNG DẪN GIẢI)
+             =================================================================== -->
+        <section class="view-section active" id="view-sheet">
+
+            <div class="print-sheet-header" style="display: none;">
+                <div class="print-title">CẨM NANG HƯỚNG DẪN GIẢI RUBIK - PHƯƠNG PHÁP ROUX</div>
+                <p class="print-sub">Visual Roux Method Cheat Sheet & Algorithm Reference • First 2 Blocks, CMLL, LSE</p>
+            </div>
+
+            <!-- Compact Workspace Header & Search Row -->
+            <div class="sheet-top-row">
+                <h1 class="sheet-main-heading">Thư viện công thức Roux</h1>
+                <div class="search-box">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" id="sheet-search-input" placeholder="Tìm tên hoặc công thức (r U R')...">
+                </div>
+            </div>
+
+            <!-- Compact Phase Filter Strip -->
+            <div class="sheet-toolbar">
+                <div class="filters-group">
+                    <button type="button" class="filter-chip active" data-filter="all">Tất cả</button>
+                    <button type="button" class="filter-chip" data-filter="fb"><span class="phase-dot dot-fb"></span>First Block</button>
+                    <button type="button" class="filter-chip" data-filter="sb"><span class="phase-dot dot-sb"></span>Second Block</button>
+                    <button type="button" class="filter-chip" data-filter="cmll"><span class="phase-dot dot-cmll"></span>CMLL</button>
+                    <button type="button" class="filter-chip" data-filter="lse"><span class="phase-dot dot-lse"></span>LSE</button>
+                    <button type="button" class="filter-chip" data-filter="custom"><span class="phase-dot dot-custom"></span>Tự vẽ</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Cases Categorized Container -->
+            <div id="sheet-content-area"></div>
+
+        </section>
+
+        <!-- ===================================================================
+             VIEW 2: CUBE STUDIO & DRAW LAB (XƯỞNG VẼ RUBIK TRỰC QUAN)
+             =================================================================== -->
+        <section class="view-section" id="view-studio">
+            <div class="studio-layout">
+
+                <!-- Left Column: Interactive Canvas & View Modes -->
+                <div class="studio-canvas-panel">
+                    <div class="studio-panel-header">
+                        <h2 class="studio-title" id="studio-panel-title">Vẽ Khối Rubik & Thêm Trường Hợp Mới</h2>
+                        
+                        <div class="view-mode-selector">
+                            <button type="button" class="view-btn active" data-mode="iso_ufr" title="Góc nhìn 3D U-F-R">3D U-F-R</button>
+                            <button type="button" class="view-btn" data-mode="iso_ufl" title="Góc nhìn 3D U-F-L (Tối ưu cho First Block)">3D U-F-L (FB)</button>
+                            <button type="button" class="view-btn" data-mode="top_down" title="Nhìn thẳng từ trên U xuống (Chuẩn CMLL & EO)">Top-Down (CMLL)</button>
+                            <button type="button" class="view-btn" data-mode="flat_net" title="Trải phẳng toàn bộ 6 mặt chữ thập">Trải phẳng 2D</button>
+                        </div>
+                    </div>
+
+                    <!-- Studio Interaction Toolbar (Paint, Eraser, Arrow Modes) -->
+                    <div class="studio-tools-strip">
+                        <div class="tool-switch-group">
+                            <button type="button" class="studio-mode-btn active" id="studio-tool-paint" title="Cọ vẽ màu (Chuột trái tô màu, Chuột phải xóa)">
+                                <i data-lucide="paint-brush" style="width: 14px; height: 14px;"></i>
+                                <span>Cọ Vẽ</span>
+                            </button>
+                            <button type="button" class="studio-mode-btn" id="studio-tool-eraser" title="Tẩy màu (Chuột trái/phải đều xóa về xám/đen)">
+                                <i data-lucide="eraser" style="width: 14px; height: 14px;"></i>
+                                <span>Tẩy / Xóa Màu</span>
+                            </button>
+                            <button type="button" class="studio-mode-btn" id="studio-tool-arrow" title="Chế độ vẽ mũi tên: nhấp ô bắt đầu -> nhấp ô đích đến">
+                                <i data-lucide="move-right" style="width: 14px; height: 14px;"></i>
+                                <span>Vẽ Mũi Tên Trực Quan</span>
+                            </button>
+                        </div>
+
+                        <!-- Arrow Configurations (Visible when Arrow tool active) -->
+                        <div class="arrow-options-group">
+                            <select id="studio-arrow-type" class="tool-inline-select" title="Loại mũi tên">
+                                <option value="1way">Mũi tên 1 chiều (→)</option>
+                                <option value="2way">Mũi tên 2 chiều hoán vị (↔)</option>
+                            </select>
+                            <select id="studio-arrow-color" class="tool-inline-select" title="Màu mũi tên">
+                                <option value="#38BDF8">Xanh Cyan</option>
+                                <option value="#FDE047">Vàng</option>
+                                <option value="#EF4444">Đỏ</option>
+                                <option value="#10B981">Xanh Lá</option>
+                            </select>
+                            <button type="button" class="action-btn" id="studio-btn-clear-arrows" title="Xóa toàn bộ mũi tên">
+                                <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i> Xóa Mũi Tên
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Studio Orientation Guide Bar -->
+                    <div class="studio-orientation-bar" id="studio-orientation-bar" title="Quy chuẩn màu các mặt phương pháp Roux">
+                        <div class="orientation-bar-item"><span class="badge-dot" style="background:#EF4444;"></span><strong>F (Trước):</strong> Đỏ</div>
+                        <div class="orientation-bar-item"><span class="badge-dot" style="background:#10B981;"></span><strong>R (Phải):</strong> Xanh lá</div>
+                        <div class="orientation-bar-item"><span class="badge-dot" style="background:#FDE047;"></span><strong>U (Trên):</strong> Vàng</div>
+                        <div class="orientation-bar-item"><span class="badge-dot" style="background:#3B82F6;"></span><strong>L (Trái):</strong> Xanh dương</div>
+                        <div class="orientation-bar-item"><span class="badge-dot" style="background:#FFFFFF; border: 1px solid #475569;"></span><strong>D (Đáy):</strong> Trắng</div>
+                        <div class="orientation-bar-item"><span class="badge-dot" style="background:#F97316;"></span><strong>B (Sau):</strong> Cam</div>
+                    </div>
+
+                    <!-- Interactive Drawing Canvas -->
+                    <div class="studio-canvas-area" id="studio-canvas-area">
+                        <!-- Rendered SVG will be placed here -->
+                    </div>
+
+                    <!-- Bottom Canvas Status & Actions -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <span id="studio-tool-hint" style="font-size: 0.775rem; color: var(--text-secondary); font-weight: 500;">
+                            Nhấp trái: Tô màu • Nhấp phải: Xóa về xám • Giữ & kéo: Xoay khối 3D 360°
+                        </span>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="action-btn btn-primary" id="studio-btn-solve-cube" title="Tự động giải khối Rubik bạn vừa tô màu">
+                                <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+                                <span>Giải Khối Đang Vẽ</span>
+                            </button>
+                            <button type="button" class="action-btn" id="studio-btn-export-png" title="Tải riêng ảnh khối Rubik này về máy">
+                                <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                                <span>Tải Ảnh PNG</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Color Swatches, Presets, Simulator & Case Info Form -->
+                <div class="studio-sidebar">
+
+                    <!-- 1. Color Palette -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">
+                            <span>Bảng Màu Tô Sticker</span>
+                            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 500;">Chuột phải = Xóa ô</span>
+                        </div>
+                        <div class="palette-grid" id="studio-palette-grid"></div>
+                    </div>
+
+                    <!-- 2. Roux Quick Mask Presets -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">
+                            <span>Preset Mask Cho Roux</span>
+                            <span style="font-size: 0.7rem; color: var(--accent); font-weight: 500;">1-Click</span>
+                        </div>
+                        <div class="preset-buttons-grid">
+                            <button type="button" class="preset-btn" id="preset-fb" title="Chỉ làm sáng khối 1x2x3 bên trái">
+                                <i data-lucide="layers" style="width: 14px; height: 14px;"></i> Mask First Block
+                            </button>
+                            <button type="button" class="preset-btn" id="preset-sb" title="Chỉ làm sáng khối 1x2x3 bên phải">
+                                <i data-lucide="layers" style="width: 14px; height: 14px;"></i> Mask Second Block
+                            </button>
+                            <button type="button" class="preset-btn" id="preset-cmll" title="Tầng 1-2 xám, sáng 4 góc U">
+                                <i data-lucide="maximize" style="width: 14px; height: 14px;"></i> Mask CMLL
+                            </button>
+                            <button type="button" class="preset-btn" id="preset-cmll-top" title="Chỉ tập trung 4 góc U và viền cạnh">
+                                <i data-lucide="square" style="width: 14px; height: 14px;"></i> CMLL Top Only
+                            </button>
+                            <button type="button" class="preset-btn" id="preset-lse" title="Tập trung 6 cạnh cuối cùng">
+                                <i data-lucide="circle-dot" style="width: 14px; height: 14px;"></i> Mask LSE (6 Edges)
+                            </button>
+                            <button type="button" class="preset-btn btn-solved" id="preset-solved" title="Đưa khối về trạng thái đã giải đầy đủ">
+                                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Khối Đã Giải
+                            </button>
+                            <button type="button" class="preset-btn btn-accent-tint" id="preset-autofill-solved" title="Tự động điền các ô xám thành màu đã giải để sẵn sàng tính lời giải">
+                                <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Điền Màu Còn Lại
+                            </button>
+                            <button type="button" class="preset-btn btn-clear" id="preset-grey" title="Làm xám toàn bộ khối để vẽ tự do">
+                                <i data-lucide="paint-bucket" style="width: 14px; height: 14px;"></i> Xám Toàn Bộ
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. Algorithm Simulator & Scramble Generator -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">
+                            <span>Giả Lập Thuật Toán (Simulator)</span>
+                        </div>
+                        <div class="sim-input-group">
+                            <input type="text" id="studio-sim-input" placeholder="Nhập chuỗi xoay (VD: r U R' U' r' R U R U' R')...">
+                        </div>
+                        <div class="sim-btn-row">
+                            <button type="button" class="sim-action-btn" id="studio-btn-run-sim" title="Chạy công thức trên cube hiện tại">
+                                <i data-lucide="play" style="width: 13px; height: 13px; display: inline-block; vertical-align: -2px;"></i> Xoay Thử
+                            </button>
+                            <button type="button" class="sim-action-btn" id="studio-btn-invert-sim" title="Tạo trạng thái Scramble để giải">
+                                <i data-lucide="shuffle" style="width: 13px; height: 13px; display: inline-block; vertical-align: -2px;"></i> Nghịch Đảo (Scramble)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4. Case Metadata Form -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">
+                            <span>Lưu Vào Tờ Hướng Dẫn</span>
+                        </div>
+                        <form id="studio-case-form" class="studio-form">
+                            <div class="form-field">
+                                <label class="form-label" for="form-case-title">Tên Trường Hợp *</label>
+                                <input type="text" id="form-case-title" class="form-input" placeholder="VD: FB: Ghép cặp FL cạnh kẹt..." required>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                <div class="form-field">
+                                    <label class="form-label" for="form-case-category">Giai Đoạn *</label>
+                                    <select id="form-case-category" class="form-select">
+                                        <option value="fb">First Block (FB)</option>
+                                        <option value="sb">Second Block (SB)</option>
+                                        <option value="cmll">CMLL (4 Góc)</option>
+                                        <option value="lse">LSE (6 Cạnh Cuối)</option>
+                                        <option value="custom">Tự Tạo / Ghi Chú</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label class="form-label" for="form-case-group">Phân Nhóm</label>
+                                    <input type="text" id="form-case-group" class="form-input" placeholder="VD: Cặp FL, Nhóm T, EO...">
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="form-case-alg">Công Thức Thuật Toán (Algorithm)</label>
+                                <input type="text" id="form-case-alg" class="form-input" placeholder="VD: r U' r2' U r2 U r2' U' r">
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="form-case-desc">Nhận Diện & Cần Làm Gì (What to do)</label>
+                                <textarea id="form-case-desc" class="form-textarea" placeholder="Mô tả đặc điểm nhận diện trường hợp và các bước cần thao tác..."></textarea>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="form-case-tips">Mẹo Bấm Ngón (Finger-tricks / Trigger)</label>
+                                <input type="text" id="form-case-tips" class="form-input" placeholder="VD: Dùng ngón áp út gạt D', kết thúc bằng Sledgehammer...">
+                            </div>
+
+                            <button type="submit" class="action-btn btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem; margin-top: 0.5rem;">
+                                <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                                <span>Lưu Trường Hợp Này Vào Sheet</span>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 3: SPEEDCUBING TIMER & ROUX SCRAMBLER
+             =================================================================== -->
+        <section class="view-section" id="view-timer">
+            <div class="timer-layout">
+                
+                <!-- Scramble Bar -->
+                <div class="timer-scramble-bar">
+                    <div class="scramble-controls-left">
+                        <select id="timer-scramble-type" class="timer-select-mode">
+                            <option value="wca">Full 3x3 Scramble (WCA 21 moves)</option>
+                            <option value="cmll">Roux CMLL Training (4 Góc)</option>
+                            <option value="lse">Roux LSE Training (6 Cạnh Cuối)</option>
+                        </select>
+                        <button type="button" class="action-btn" id="btn-timer-new-scramble" title="Đổi Scramble mới">
+                            <i data-lucide="shuffle" style="width: 14px; height: 14px;"></i> Scramble Mới
+                        </button>
+                        <button type="button" class="action-btn btn-primary" id="btn-timer-show-solution" title="Xem giải pháp theo phương pháp Roux">
+                            <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Lời Giải Roux Cho Scramble Này
+                        </button>
+                    </div>
+                    <div class="scramble-text" id="timer-scramble-display">B' U2 F L2 B2 D2 F' R2 U2 B' L2 R' B2 D' F' U' L' F' R2 D' F</div>
+                </div>
+
+                <!-- Main Arena: Touchpad / Space Timer & Cube 3D Preview -->
+                <div class="timer-arena">
+                    <div class="timer-touch-pad" id="timer-touch-pad">
+                        <div class="timer-digital-clock" id="timer-time-display">0.000</div>
+                        <div class="timer-instruction">
+                            <span class="desktop-hint">Nhấn giữ phím <kbd>Space</kbd> đến khi đổi màu xanh lá rồi thả ra để tính giờ</span>
+                            <span class="mobile-hint">Chạm và giữ màn hình để bắt đầu</span>
+                        </div>
+                    </div>
+
+                    <!-- Scramble Preview Cube -->
+                    <div class="timer-cube-box" title="Trạng thái khối sau khi xáo trộn (Scramble)">
+                        <div id="timer-cube-preview"></div>
+                        <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">Khối sau Scramble</span>
+                    </div>
+                </div>
+
+                <!-- Stats Dashboard & History -->
+                <div class="timer-dashboard">
+                    <div class="timer-stats-row">
+                        <div class="timer-stat-card">
+                            <span class="stat-label">Lần giải</span>
+                            <span class="stat-value" id="timer-stat-count">0</span>
+                        </div>
+                        <div class="timer-stat-card">
+                            <span class="stat-label">Kỷ lục (Best)</span>
+                            <span class="stat-value highlight-cyan" id="timer-stat-best">--</span>
+                        </div>
+                        <div class="timer-stat-card">
+                            <span class="stat-label">Trung bình 5 (ao5)</span>
+                            <span class="stat-value highlight-emerald" id="timer-stat-ao5">--</span>
+                        </div>
+                        <div class="timer-stat-card">
+                            <span class="stat-label">Trung bình 12 (ao12)</span>
+                            <span class="stat-value" id="timer-stat-ao12">--</span>
+                        </div>
+                    </div>
+
+                    <div class="timer-history-container">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <strong style="font-size: 0.85rem; color: var(--text-secondary);">Lịch Sử Lần Giải</strong>
+                            <button type="button" class="case-footer-btn" id="btn-timer-clear-history" style="color: var(--rose);">
+                                <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i> Xóa lịch sử
+                            </button>
+                        </div>
+                        <div class="history-list-scroll" id="timer-history-list"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =======================================================================
+         MODAL: 3D INTERACTIVE CUBE PLAYER
+         ======================================================================= -->
+    <div class="modal-backdrop" id="modal-3d-player">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-3d-title">Trình Chiếu Hoạt Ảnh 3D</h3>
+                <button type="button" class="modal-close-btn" id="modal-close-3d">
+                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="player-orientation-banner">
+                    <i data-lucide="compass" style="width: 14px; height: 14px; color: var(--accent);"></i>
+                    <span><strong>Hướng cầm:</strong> F (Đỏ) trước mặt • U (Vàng) trên đỉnh • L (Xanh dương) bên trái • R (Xanh lá) bên phải</span>
+                </div>
+                <div class="player-view-selector-bar">
+                    <button type="button" class="view-btn-3d" data-view="iso_ufl">
+                        <i data-lucide="box" style="width: 13px; height: 13px;"></i> Khối Trái U-F-L (FB)
+                    </button>
+                    <button type="button" class="view-btn-3d" data-view="iso_ufr">
+                        <i data-lucide="box" style="width: 13px; height: 13px;"></i> Khối Phải U-F-R (SB)
+                    </button>
+                    <button type="button" class="view-btn-3d" data-view="top_down">
+                        <i data-lucide="layout-grid" style="width: 13px; height: 13px;"></i> Trên Đỉnh U (CMLL)
+                    </button>
+                </div>
+                <div id="cube3d-container"></div>
+                <div class="player-controls">
+                    <div class="alg-tokens-strip" id="player-alg-strip"></div>
+                    <div class="player-btn-row">
+                        <button type="button" class="control-btn" id="player-btn-reset" title="Bắt đầu lại">
+                            <i data-lucide="rotate-ccw" style="width: 15px; height: 15px;"></i> Làm lại
+                        </button>
+                        <button type="button" class="control-btn" id="player-btn-prev" title="Bước lùi">
+                            <i data-lucide="chevron-left" style="width: 15px; height: 15px;"></i> Lùi
+                        </button>
+                        <button type="button" class="control-btn btn-play-pause" id="player-btn-play" title="Phát hoạt ảnh">
+                            <i data-lucide="play" style="width: 15px; height: 15px;"></i> Chạy
+                        </button>
+                        <button type="button" class="control-btn" id="player-btn-next" title="Bước tiếp">
+                            Tiếp <i data-lucide="chevron-right" style="width: 15px; height: 15px;"></i>
+                        </button>
+                    </div>
+
+                    <div class="virtual-keypad">
+                        <button type="button" class="key-move-btn" data-move="R">R</button>
+                        <button type="button" class="key-move-btn" data-move="R'">R'</button>
+                        <button type="button" class="key-move-btn" data-move="U">U</button>
+                        <button type="button" class="key-move-btn" data-move="U'">U'</button>
+                        <button type="button" class="key-move-btn" data-move="r">r</button>
+                        <button type="button" class="key-move-btn" data-move="r'">r'</button>
+                        <button type="button" class="key-move-btn" data-move="M">M</button>
+                        <button type="button" class="key-move-btn" data-move="M'">M'</button>
+                        <button type="button" class="key-move-btn" data-move="M2">M2</button>
+                        <button type="button" class="key-move-btn" data-move="F">F</button>
+                        <button type="button" class="key-move-btn" data-move="F'">F'</button>
+                        <button type="button" class="key-move-btn" data-move="D">D</button>
+                        <button type="button" class="key-move-btn" data-move="D'">D'</button>
+                    </div>
+                </div>
+
+                <!-- 3D Player Case Instructions Card -->
+                <div class="player-case-info-card" id="player-case-info-card" style="display: none;">
+                    <div class="player-info-heading">
+                        <i data-lucide="target" style="width: 14px; height: 14px;"></i>
+                        <span>Hướng Dẫn Bước Này</span>
+                    </div>
+                    <div class="player-info-desc" id="player-info-goal-desc"></div>
+                    <div class="player-info-tip" id="player-info-tip-row">
+                        <i data-lucide="lightbulb" style="width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px;"></i>
+                        <span id="player-info-tip-text"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         MODAL: ROUX & CUBE SOLUTION VIEWER
+         ======================================================================= -->
+    <div class="modal-backdrop" id="modal-solution">
+        <div class="modal-dialog" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="sparkles" style="width: 18px; height: 18px; color: var(--accent);"></i>
+                    <span>Hướng Dẫn Lời Giải Từng Bước</span>
+                </h3>
+                <button type="button" class="modal-close-btn" id="modal-close-solution">
+                    <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="align-items: stretch; max-height: 80vh; overflow-y: auto;">
+                <div id="solution-content-area"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         MODAL: COMPREHENSIVE ROUX METHOD GUIDE (CẨM NANG ROUX)
+         ======================================================================= -->
+    <div class="modal-backdrop" id="modal-roux-guide">
+        <div class="modal-dialog" style="max-width: 720px;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="book-open" style="width: 18px; height: 18px; color: var(--accent);"></i>
+                    <span>Cẩm Nang Phương Pháp Roux</span>
+                </h3>
+                <button type="button" class="modal-close-btn" id="modal-close-roux-guide">
+                    <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="align-items: stretch; max-height: 80vh; overflow-y: auto; padding: 1.25rem;">
+                
+                <!-- Section 1: Holding & Colors -->
+                <div class="roux-guide-section">
+                    <h4>
+                        <i data-lucide="compass" style="width: 15px; height: 15px;"></i>
+                        1. Quy Tắc Cầm Khối & Hệ Màu Chuẩn
+                    </h4>
+                    <p>Trong phương pháp Roux, bạn cố định góc nhìn để tối ưu hóa việc quan sát và thực hiện finger-tricks:</p>
+                    <div class="roux-guide-grid">
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#EF4444;"></span>Mặt Trước (F): Đỏ</h5>
+                            <p>Luôn hướng thẳng về phía bạn. Đây là mặt mốc cho các bước xoay F, F'.</p>
+                        </div>
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#EAB308;"></span>Mặt Trên (U): Vàng</h5>
+                            <p>Luôn ở trên đỉnh. Tầng U là nơi ghép cặp, hoán vị góc CMLL và xoay cạnh LSE.</p>
+                        </div>
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#3B82F6;"></span>Mặt Trái (L): Xanh Dương</h5>
+                            <p>Nơi xây <strong>First Block (FB 1x2x3)</strong>. Khi FB xong, mặt này được giữ nguyên cố định.</p>
+                        </div>
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#10B981;"></span>Mặt Phải (R): Xanh Lá</h5>
+                            <p>Nơi xây <strong>Second Block (SB 1x2x3)</strong> bằng các bước &lt;r, R, U, M&gt;.</p>
+                        </div>
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#F5F5F7; border: 1px solid rgba(128,128,128,0.4);"></span>Mặt Đáy (D): Trắng</h5>
+                            <p>Ở dưới đáy. Chứa 2 cạnh đáy quan trọng là D-L (White-Blue) và D-R (White-Green).</p>
+                        </div>
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#F97316;"></span>Mặt Sau (B): Cam</h5>
+                            <p>Phía sau lưng bạn, đối diện mặt F.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: 4 Core Phases -->
+                <div class="roux-guide-section">
+                    <h4>
+                        <i data-lucide="layers" style="width: 15px; height: 15px;"></i>
+                        2. Bốn Giai Đoạn Cốt Lõi Của Phương Pháp Roux
+                    </h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#3B82F6;"></span>Bước 1: First Block (FB) · Khối 1×2×3 Bên Trái</h5>
+                            <p>Mục tiêu: Giải cạnh đáy D-L (White-Blue), sau đó ghép cặp trước FL và cặp sau BL. Roux <strong>không cần căn tâm</strong>, bạn tự do xoay D, L, U, M để xây khối.</p>
+                        </div>
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#10B981;"></span>Bước 2: Second Block (SB) · Khối 1×2×3 Bên Phải</h5>
+                            <p>Mục tiêu: Đưa cạnh D-R (White-Green) xuống đáy và ghép 2 cặp FR, BR. <strong>Quy tắc sống còn:</strong> Chỉ dùng &lt;r, R, U, M&gt; để không phá vỡ First Block bên trái.</p>
+                        </div>
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#EAB308;"></span>Bước 3: CMLL · Giải 4 Góc Tầng Cuối</h5>
+                            <p>Mục tiêu: Định hướng và hoán vị toàn bộ 4 góc mặt U cùng lúc mà không làm hỏng F2B. Gồm 7 nhóm thế góc: T, U, L, Sune, Anti-Sune, Pi, H.</p>
+                        </div>
+                        <div class="roux-guide-card">
+                            <h5><span class="guide-color-dot" style="background:#F97316;"></span>Bước 4: LSE · 6 Cạnh Cuối Cùng</h5>
+                            <p>Chỉ dùng 2 lát xoay &lt;M, U&gt;: <strong>4a (EO)</strong> định hướng 6 cạnh; <strong>4b (UL/UR)</strong> đặt 2 cạnh trái phải; <strong>4c (EP)</strong> hoán vị 4 cạnh M-slice và tâm về Solved 100%.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Finger-tricks -->
+                <div class="roux-guide-section">
+                    <h4>
+                        <i data-lucide="zap" style="width: 15px; height: 15px;"></i>
+                        3. Kỹ Thuật Xoay Lát Cắt M (M-Slice Finger-tricks)
+                    </h4>
+                    <p>Lát cắt M (M-slice) di chuyển song song với L và R theo trục đứng:</p>
+                    <ul style="font-size: 0.825rem; color: var(--text-secondary); line-height: 1.6; padding-left: 1.25rem;">
+                        <li><strong>Bước M':</strong> Dùng đầu ngón đeo nhẫn đặt ở cạnh DB dưới đáy, gẩy đẩy lên phía sau.</li>
+                        <li><strong>Bước M2:</strong> Thực hiện "double flick": ngón đeo nhẫn gẩy bước đầu tiên, ngay lập tức ngón giữa gẩy bước thứ hai.</li>
+                        <li><strong>Bước M:</strong> Dùng ngón trỏ đẩy cạnh UF từ trên xuống hoặc dùng ngón cái tỳ cạnh DF kéo lên.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         MODAL: CASE DETAILED SOLVE GUIDE (HƯỚNG DẪN GIẢI TỪNG CASE)
+         ======================================================================= -->
+    <div class="modal-backdrop" id="modal-case-detail">
+        <div class="modal-dialog" style="max-width: 680px;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="book-open" style="width: 18px; height: 18px; color: var(--accent);"></i>
+                    <span id="case-detail-modal-title">Hướng Dẫn Giải Chi Tiết</span>
+                </h3>
+                <button type="button" class="modal-close-btn" id="modal-close-case-detail">
+                    <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="align-items: stretch; max-height: 82vh; overflow-y: auto; padding: 1.25rem;">
+                <div id="case-detail-content-area"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         MODAL: ADMIN AUTHENTICATION
+         ======================================================================= -->
+    <div class="modal-backdrop" id="modal-login">
+        <div class="modal-dialog" style="max-width: 420px;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="shield-check" style="width: 18px; height: 18px; color: var(--accent);"></i>
+                    <span>Đăng Nhập Quản Trị Viên</span>
+                </h3>
+                <button type="button" class="modal-close-btn" id="modal-close-login">
+                    <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 1.25rem;">
+                <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1.1rem; line-height: 1.5;">
+                    Vui lòng đăng nhập để mở khóa quyền chỉnh sửa, thêm trường hợp mới và sắp xếp thứ tự thẻ công thức.
+                </p>
+                <form id="form-admin-login">
+                    <div class="form-field" style="margin-bottom: 0.85rem;">
+                        <label class="form-label" for="login-username">Tên tài khoản (UID)</label>
+                        <input type="text" id="login-username" class="form-input" autocomplete="username" placeholder="Nhập tên tài khoản..." required>
+                    </div>
+                    <div class="form-field" style="margin-bottom: 1rem;">
+                        <label class="form-label" for="login-password">Mật khẩu</label>
+                        <input type="password" id="login-password" class="form-input" autocomplete="current-password" placeholder="Nhập mật khẩu..." required>
+                    </div>
+                    <div id="login-error-msg" style="display: none; font-size: 0.78rem; color: var(--rose); margin-bottom: 0.85rem; padding: 0.45rem 0.65rem; border-radius: 6px; background: rgba(255, 69, 58, 0.1);">
+                        Tên tài khoản hoặc mật khẩu không chính xác.
+                    </div>
+                    <button type="submit" class="action-btn btn-primary" style="width: 100%; justify-content: center; height: 38px;">
+                        <i data-lucide="log-in" style="width: 15px; height: 15px;"></i>
+                        <span>Đăng Nhập</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Application Core Scripts -->
+    <script src="js/sound-engine.js?v=20261118-apple8"></script>
+    <script src="js/cube-model.js?v=20261118-apple8"></script>
+    <script src="js/cube-renderer.js?v=20261118-apple8"></script>
+    <script src="js/virtual-cube-3d.js?v=20261118-apple8"></script>
+    <script src="js/roux-data.js?v=20261118-apple8"></script>
+    <script src="js/cube-solver.js?v=20261118-apple8"></script>
+    <script src="js/cube-timer.js?v=20261118-apple8"></script>
+    <script src="js/app.js?v=20261118-apple8"></script>
+</body>
+</html>
